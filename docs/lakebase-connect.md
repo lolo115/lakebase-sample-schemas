@@ -3,49 +3,58 @@
 Lakebase is standard PostgreSQL, reachable over the wire with `psql` and any libpq client.
 Authentication uses a short-lived OAuth token as the password.
 
-## Autoscaling Postgres (projects / branches / endpoints)
+## Prerequisite: the target database must already exist
 
-Discover your project, branch, endpoint and database with the Databricks CLI:
+`load_all.sh` creates the `hr`, `co` and `sh` **schemas** inside the database your connection
+points at — it does **not** create the database itself. Create the target database once before
+running the loader (name it whatever you like; this repo uses `lakebase-sample-db` as the example):
 
 ```bash
-PROFILE=decat        # your ~/.databrickscfg profile for the workspace
+PROFILE=<profile>                          # your ~/.databrickscfg profile for the workspace
+BRANCH=projects/<project>/branches/<branch>
 
-databricks postgres list-projects -p "$PROFILE"
-databricks postgres list-branches  projects/<project>/... -p "$PROFILE"
+# choose the Postgres role that will own the database
+databricks postgres list-roles "$BRANCH" -p "$PROFILE"
+
+# both spec.postgres_database and spec.role are required
+databricks postgres create-database "$BRANCH" \
+  --database-id lakebase-sample-db \
+  --json '{"spec":{"postgres_database":"lakebase-sample-db","role":"projects/<project>/branches/<branch>/roles/<role-id>"}}' \
+  -p "$PROFILE"
+```
+
+## Discover your project / branch / endpoint / database
+
+```bash
+PROFILE=<profile>
+databricks postgres list-projects  -p "$PROFILE"
+databricks postgres list-branches  projects/<project> -p "$PROFILE"
 databricks postgres list-endpoints projects/<project>/branches/<branch> -p "$PROFILE"
 databricks postgres list-databases projects/<project>/branches/<branch> -p "$PROFILE"
 ```
 
-Generate a credential (token) for the endpoint and connect:
+## Connect and load
+
+Generate a credential (token) for the endpoint, point libpq at the database you created, and
+run the loader:
 
 ```bash
+PROFILE=<profile>
 EP=projects/<project>/branches/<branch>/endpoints/<endpoint>
+
 export PGPASSWORD=$(databricks postgres generate-database-credential "$EP" -p "$PROFILE" \
     | python3 -c 'import sys,json;print(json.load(sys.stdin)["token"])')
 export PGHOST=<endpoint>.database.<region>.cloud.databricks.com
 export PGPORT=5432
-export PGDATABASE=<your-database>
+export PGDATABASE=lakebase-sample-db          # the database created in the prerequisite step
 export PGUSER="you@databricks.com"
 export PGSSLMODE=require
 
-psql -c "select current_user, current_database();"
+psql -c "select current_user, current_database();"   # sanity check
+./load_all.sh
 ```
 
 The token is short-lived (~1 hour); regenerate it if a long load expires it.
-
-## Example: the fevm-decathlon-lakebase demo workspace
-
-```bash
-PROFILE=decat
-EP=projects/laurent-prj/branches/production/endpoints/primary
-export PGPASSWORD=$(databricks postgres generate-database-credential "$EP" -p "$PROFILE" \
-    | python3 -c 'import sys,json;print(json.load(sys.stdin)["token"])')
-export PGHOST=ep-crimson-sun-d7j097rv.database.eu-central-1.cloud.databricks.com
-export PGPORT=5432 PGDATABASE=decat-db PGSSLMODE=require
-export PGUSER="you@databricks.com"
-
-./load_all.sh
-```
 
 ## Notes for Lakebase
 

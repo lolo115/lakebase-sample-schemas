@@ -48,6 +48,9 @@ docs/                       type-mapping, lakebase-connect, conversion-notes
 
 ## Prerequisites
 
+- A **target database that already exists** — `load_all.sh` creates the `hr`/`co`/`sh`
+  schemas *inside* the database you connect to; it does **not** create the database itself.
+  Create one first (e.g. `lakebase-sample-db`); see [docs/lakebase-connect.md](docs/lakebase-connect.md).
 - `psql` (PostgreSQL 14+ client; **server target is PostgreSQL 16/17**, e.g. Lakebase)
 - `gzip` (SH data is loaded from `*.csv.gz` via `\copy ... FROM PROGRAM 'gzip -dc ...'`)
 - `python3` — only if you want to regenerate the data files from the Oracle source
@@ -59,7 +62,7 @@ docs/                       type-mapping, lakebase-connect, conversion-notes
 
    ```bash
    export PGHOST=<endpoint>.database.<region>.cloud.databricks.com
-   export PGPORT=5432 PGDATABASE=<your-db> PGSSLMODE=require
+   export PGPORT=5432 PGDATABASE=lakebase-sample-db PGSSLMODE=require
    export PGUSER="you@databricks.com"
    export PGPASSWORD=$(databricks postgres generate-database-credential \
        projects/<proj>/branches/<branch>/endpoints/<ep> -p <profile> \
