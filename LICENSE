@@ -1,7 +1,14 @@
 MIT License
 
-The Oracle sample schemas (DDL and data) are Copyright (c) Oracle and/or its
-affiliates and are distributed under the MIT License; see ORACLE-LICENSE.txt.
+The Oracle sample schemas HR, CO and SH (DDL and data) are Copyright (c) Oracle
+and/or its affiliates and are distributed under the MIT License; see
+ORACLE-LICENSE.txt.
+
+The `scott` schema (EMP/DEPT/BONUS/SALGRADE) is NOT part of that MIT-licensed
+project. It is the historical Oracle "scott/tiger" demo shipped with Oracle
+Database (utlsampl.sql, Oracle-copyrighted), reproduced here from its
+long-published definition for educational/testing use. No separate license is
+claimed for it; it is not covered by the MIT grant of this file.
 
 The PostgreSQL / Lakebase ports, conversion tooling, and documentation in this
 repository are Copyright (c) 2026 the repository authors and are likewise made

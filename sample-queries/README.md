@@ -19,5 +19,6 @@ or paste a file's contents into psql / any SQL client.
 | `hr/` | Headcount & pay bands, top earners, out-of-range salaries, org hierarchy (recursive), manager spans, commissions, geography, hiring trends, job history, salary distribution |
 | `co/` | Revenue by status, top customers/products, monthly trend, store AOV, JSON product reviews & attributes, repeat customers, stock vs demand, fulfilment |
 | `sh/` | Revenue by year/channel/region, monthly trend, promotion breakdown, profit & margin (profits view), year-over-year growth, demographics, top customers with running total |
+| `scott/` | Classic scott/tiger exercises: emp↔dept↔location, earn-more-than-manager (self-join), manager names, salary grades, department rollups, above-dept-average, org hierarchy (recursive), payroll by job, hires per year, total earnings incl. commission |
 
 All queries are read-only `SELECT`s and were verified against a loaded PostgreSQL 17 / Lakebase database.

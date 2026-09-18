@@ -13,7 +13,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 PSQL=(psql -v ON_ERROR_STOP=1 -X -q)
 
-SCHEMAS=("$@"); [ ${#SCHEMAS[@]} -eq 0 ] && SCHEMAS=(hr co sh)
+SCHEMAS=("$@"); [ ${#SCHEMAS[@]} -eq 0 ] && SCHEMAS=(hr co sh scott)
 
 echo "== creating schemas =="
 "${PSQL[@]}" -f "$ROOT/sql/00_schemas.sql"
@@ -31,5 +31,6 @@ echo "== row counts =="
   UNION ALL SELECT 'sh.customers',   count(*) FROM sh.customers
   UNION ALL SELECT 'sh.costs',       count(*) FROM sh.costs
   UNION ALL SELECT 'sh.sales',       count(*) FROM sh.sales
+  UNION ALL SELECT 'scott.emp',      count(*) FROM scott.emp
   ORDER BY 1;"
 echo "Done."

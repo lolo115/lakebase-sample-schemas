@@ -14,11 +14,14 @@ The data is Oracle's own open-source sample data, **ported verbatim** to Postgre
 | **HR** – Human Resources | `hr` | ✅ full (DDL + data) | 7 tables, sequences, view, trigger |
 | **CO** – Customer Orders | `co` | ✅ full (DDL + data) | 7 tables, JSON (`jsonb`), identity cols, 4 views |
 | **SH** – Sales History   | `sh` | ✅ full (DDL + data) | 9 tables, **range partitioning**, ~0.9M-row `sales` fact, materialized views |
+| **SCOTT** – classic `scott/tiger` | `scott` | ✅ full (DDL + data) | the legacy Oracle demo: `EMP` / `DEPT` / `BONUS` / `SALGRADE` |
 
-These are the three schemas Oracle actively maintains. Oracle's other, *archived* sample
-schemas — **OE** (Order Entry / Online Catalog) and **PM** (Product Media) — are intentionally
-**not** included: they rely on Oracle-only features (object types, `VARRAY`, nested tables,
-`XMLTYPE`, `ORDSYS` multimedia) that have no PostgreSQL equivalent and cannot be ported "verbatim".
+HR, CO and SH are the schemas Oracle actively maintains; **SCOTT** is the legendary legacy
+`scott/tiger` demo (`EMP`/`DEPT`/`BONUS`/`SALGRADE`), ported from Oracle's `utlsampl.sql` and
+included for convenience. Oracle's other, *archived* sample schemas — **OE** (Order Entry /
+Online Catalog) and **PM** (Product Media) — are intentionally **not** included: they rely on
+Oracle-only features (object types, `VARRAY`, nested tables, `XMLTYPE`, `ORDSYS` multimedia)
+that have no PostgreSQL equivalent and cannot be ported "verbatim".
 
 > **Validated:** the full load runs clean on a Databricks Lakebase PostgreSQL 17 database
 > (`sh.sales` = 918,843 rows), including partition routing, foreign keys, the `jsonb`/`GROUPING SETS`/
@@ -34,6 +37,7 @@ schemas — **OE** (Order Entry / Online Catalog) and **PM** (Product Media) —
 | `sh.costs` | 82,111 |
 | `sh.sales` | **918,842** |
 | `sh.times` / `sh.products` / … | dimensions |
+| `scott.emp` / `scott.dept` / `scott.salgrade` | 14 / 4 / 5 (`scott.bonus` empty) |
 
 ## Repo layout
 
@@ -101,7 +105,16 @@ python3 tools/convert_oracle_to_pg.py /path/to/db-sample-schemas .
 
 ## License & provenance
 
-Data and original DDL: **Oracle sample schemas**, MIT License
+Data and original DDL for **HR, CO and SH**: **Oracle sample schemas**, MIT License
 (<https://github.com/oracle-samples/db-sample-schemas>) — see `ORACLE-LICENSE.txt`.
 The PostgreSQL ports and tooling in this repo are provided under the same MIT terms.
 This is a community port and is **not** an Oracle or Databricks product.
+
+> **The `scott` schema is different.** `scott` (`EMP`/`DEPT`/`BONUS`/`SALGRADE`) is **not** part
+> of the MIT-licensed `oracle-samples/db-sample-schemas` project. It is the historical Oracle
+> "scott/tiger" demo, distributed for decades with Oracle Database
+> (`$ORACLE_HOME/rdbms/admin/utlsampl.sql`, which is Oracle-copyrighted). Its tiny, ubiquitous
+> structure and data are reproduced here from their long-published definition for educational and
+> testing convenience — it is **not** covered by the MIT grant above, and no separate license is
+> claimed for it. If licensing matters for your use, treat `scott` accordingly, or simply skip it:
+> `./load_all.sh hr co sh`.
